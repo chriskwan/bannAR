@@ -78,7 +78,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
   //   b: 88
   // }
 
-  var myVid = document.getElementById('myvid');
+  // Create canvas
+  var canvas = document.createElement('canvas');
+  canvas.width = 800;
+  canvas.height = 600;
+  canvas.id = "video"
+  document.getElementById("container").appendChild( canvas );
+
+  var myVid = canvas;
   var context = myVid.getContext('2d')
   var draw = function(frame, dt) {
     update(context, frame, targetColor)

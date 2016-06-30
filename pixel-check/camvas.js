@@ -27,8 +27,6 @@ window.requestAnimationFrame = window.requestAnimationFrame ||
                                window.msRequestAnimationFrame ||
                                window.oRequestAnimationFrame
 
-// navigator.getUserMedia({ audio: false, video: { facingMode: { exact: "environment" } } })
-
 // The function takes a canvas context and a `drawFunc` function.
 // `drawFunc` receives two parameters, the video and the time since
 // the last time it was called.
