@@ -14,9 +14,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 // nightly build, you don't deserve exceptions.
 window.URL = window.URL || window.webkitURL
 
-navigator.getUserMedia  = navigator.getUserMedia || 
+// MediaDevices.getUserMedia({ audio: false, video: { facingMode: { exact: "environment" } } })
+
+navigator.getUserMedia  = navigator.getUserMedia ||
                           navigator.webkitGetUserMedia ||
-                          navigator.mozGetUserMedia || 
+                          navigator.mozGetUserMedia ||
                           navigator.msGetUserMedia
 
 window.requestAnimationFrame = window.requestAnimationFrame ||
@@ -24,6 +26,8 @@ window.requestAnimationFrame = window.requestAnimationFrame ||
                                window.mozRequestAnimationFrame ||
                                window.msRequestAnimationFrame ||
                                window.oRequestAnimationFrame
+
+// navigator.getUserMedia({ audio: false, video: { facingMode: { exact: "environment" } } })
 
 // The function takes a canvas context and a `drawFunc` function.
 // `drawFunc` receives two parameters, the video and the time since
@@ -39,7 +43,7 @@ function camvas(ctx, drawFunc) {
   this.video = document.createElement('video')
 
   // If we don't do this, the stream will not be played.
-  // By the way, the play and pause controls work as usual 
+  // By the way, the play and pause controls work as usual
   // for streamed videos.
   this.video.setAttribute('autoplay', '1')
 
@@ -52,7 +56,9 @@ function camvas(ctx, drawFunc) {
   document.body.appendChild(streamContainer)
 
   // The callback happens when we are starting to stream the video.
-  navigator.getUserMedia({video: true}, function(stream) {
+  // Rear facing camera not supported in android chrome, but works in firefox
+  //     http://stackoverflow.com/questions/32086122/getusermedia-facingmode
+  navigator.getUserMedia({video: { facingMode: { exact: "environment" } }}, function(stream) {
     // Yay, now our webcam input is treated as a normal video and
     // we can start having fun
     self.video.src = window.URL.createObjectURL(stream)
@@ -62,7 +68,7 @@ function camvas(ctx, drawFunc) {
     throw err
   })
 
-  // As soon as we can draw a new frame on the canvas, we call the `draw` function 
+  // As soon as we can draw a new frame on the canvas, we call the `draw` function
   // we passed as a parameter.
   this.update = function() {
     var self = this
@@ -74,9 +80,8 @@ function camvas(ctx, drawFunc) {
       var dt = Date.now - last
       self.draw(self.video, dt)
       last = Date.now()
-      requestAnimationFrame(loop) 
+      requestAnimationFrame(loop)
     }
-    requestAnimationFrame(loop) 
-  } 
+    requestAnimationFrame(loop)
+  }
 }
-
