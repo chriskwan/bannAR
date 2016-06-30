@@ -1,8 +1,20 @@
 var useVideo = true;
-var colorThreshold = 50;
-var targetColor;
+var minColorDistance = 50;
+// var targetColor = {
+//   r: 211,
+//   g: 73,
+//   b: 62
+// };
+var targetColor = null;
 
 var colorDistance = function(color1, color2) {
+  // Compare hsv -- this makes things slow!
+  // var hsv1 = rgb2hsv(color1.r, color1.g, color1.b);
+  // var hsv2 = rgb2hsv(color2.r, color2.g, color2.b);
+  // return Math.abs(hsv1.h - hsv2.h);
+  // debugger;
+
+  // Euclidean distance
   var rSquare = Math.pow((color1.r - color2.r), 2);
   var gSquare = Math.pow((color1.g - color2.g), 2);
   var bSquare = Math.pow((color1.b - color2.b), 2);
@@ -33,15 +45,20 @@ var update = function(context, frame, targetColor) {
       var bIndex = pixelIndex + 2;
       var alphaIndex = pixelIndex + 3;
 
-      if (colorDistance(targetColor, {
-        r: pixels[rIndex],
-        g: pixels[gIndex],
-        b: pixels[bIndex]
-      }) < colorThreshold) {
-        newPixels[rIndex] = 0;
-        newPixels[gIndex] = 255;
-        newPixels[bIndex] = 0;
-        newPixels[alphaIndex] = 125;
+      if (targetColor !== null) {
+        var dist = colorDistance(targetColor, {
+          r: pixels[rIndex],
+          g: pixels[gIndex],
+          b: pixels[bIndex]
+        });
+        if (dist < minColorDistance) {
+          newPixels[rIndex] = 0;
+          newPixels[gIndex] = 255;
+          newPixels[bIndex] = 0;
+          newPixels[alphaIndex] = 125;
+
+          //("diff: " + dist);
+        }
       }
     }
   }
@@ -60,13 +77,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
   //   g: 136,
   //   b: 88
   // }
-
-  //red
-  targetColor = {
-    r: 211,
-    g: 73,
-    b: 62
-  };
 
   var myVid = document.getElementById('myvid');
   var context = myVid.getContext('2d')
@@ -107,4 +117,45 @@ function getColor(event, video, context) {
       }
     }
   }
+}
+
+// Ref: http://stackoverflow.com/a/8023734
+function rgb2hsv () {
+    var rr, gg, bb,
+        r = arguments[0] / 255,
+        g = arguments[1] / 255,
+        b = arguments[2] / 255,
+        h, s,
+        v = Math.max(r, g, b),
+        diff = v - Math.min(r, g, b),
+        diffc = function(c){
+            return (v - c) / 6 / diff + 1 / 2;
+        };
+
+    if (diff == 0) {
+        h = s = 0;
+    } else {
+        s = diff / v;
+        rr = diffc(r);
+        gg = diffc(g);
+        bb = diffc(b);
+
+        if (r === v) {
+            h = bb - gg;
+        }else if (g === v) {
+            h = (1 / 3) + rr - bb;
+        }else if (b === v) {
+            h = (2 / 3) + gg - rr;
+        }
+        if (h < 0) {
+            h += 1;
+        }else if (h > 1) {
+            h -= 1;
+        }
+    }
+    return {
+        h: Math.round(h * 360),
+        s: Math.round(s * 100),
+        v: Math.round(v * 100)
+    };
 }
