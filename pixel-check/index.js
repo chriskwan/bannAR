@@ -1,4 +1,5 @@
 var useVideo = true;
+var colorThreshold = 30;
 
 var colorDistance = function(color1, color2) {
   var rSquare = Math.pow((color1.r - color2.r), 2);
@@ -35,8 +36,11 @@ var update = function(context, frame, targetColor) {
         r: pixels[rIndex],
         g: pixels[gIndex],
         b: pixels[bIndex]
-      }) < 20) {
-        newPixels[alphaIndex] = 0;
+      }) < colorThreshold) {
+        newPixels[rIndex] = 0;
+        newPixels[gIndex] = 255;
+        newPixels[bIndex] = 0;
+        newPixels[alphaIndex] = 125;
       }
     }
   }
@@ -50,11 +54,18 @@ var update = function(context, frame, targetColor) {
 
 document.addEventListener("DOMContentLoaded", function(event) {
   //cwkTODO post-it yellow-ish
+  // var targetColor = {
+  //   r: 140,
+  //   g: 136,
+  //   b: 88
+  // }
+
+  //red
   var targetColor = {
-    r: 140,
-    g: 136,
-    b: 88
-  }
+    r: 211,
+    g: 73,
+    b: 62
+  };
 
   var context = document.getElementById('myvid').getContext('2d')
   var draw = function(frame, dt) {
