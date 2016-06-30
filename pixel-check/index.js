@@ -1,5 +1,5 @@
 var useVideo = true;
-var colorThreshold = 30;
+var colorThreshold = 50;
 
 var colorDistance = function(color1, color2) {
   var rSquare = Math.pow((color1.r - color2.r), 2);
