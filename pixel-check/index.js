@@ -1,26 +1,56 @@
-window.onload = function() {
-  var image = document.getElementById("sceneImage");
-  var canvas = document.createElement("canvas");
-  canvas.width = image.width;
-  canvas.height = image.height;
+var image, canvas, video, context;
+
+var initialize = function(){
+  // setup video
+  var video = document.querySelector("#videoElement");
+
+  navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+
+  if (navigator.getUserMedia) {
+      navigator.getUserMedia({video: true}, handleVideo, videoError);
+  }
+
+  function handleVideo(stream) {
+      video.src = window.URL.createObjectURL(stream);
+  }
+
+  function videoError(e) {
+      // do something
+  }
+
+  // setup canvas
+  image = document.getElementById("sceneImage");
+  video = document.querySelector("#videoElement");
+
+  canvas = document.createElement("canvas");
+  context = canvas.getContext("2d");
+  debugger;
+  canvas.width = video.width;
+  canvas.height = video.height;
   document.body.appendChild(canvas);
+}
 
-  var context = canvas.getContext("2d");
-  var img = document.getElementById("sceneImage");
-  context.drawImage(img, 0, 0);
+var colorDistance = function(color1, color2) {
+  var rSquare = Math.pow((color1.r - color2.r), 2);
+  var gSquare = Math.pow((color1.g - color2.g), 2);
+  var bSquare = Math.pow((color1.b - color2.b), 2);
+  var dist = Math.sqrt(rSquare + gSquare + bSquare);
+  return dist;
+}
 
-
+var update = function(targetColor) {
   var width = canvas.width;
   var height = canvas.height;
-  var pixels = context.getImageData(0, 0, width, height).data;
-  var newPixels = [];
 
-  //cwkTODO post-it yellow-ish
-  var targetColor = {
-    r: 140,
-    g: 136,
-    b: 88
-  }
+  console.log(width)
+  console.log(height)
+
+  context.drawImage(video, 0, 0, 200, 200);
+  var pixels = context.getImageData(0, 0, 200, 200).data;
+
+  console.log(pixels)
+
+  var newPixels = [];
 
   for (var pixelX = 0; pixelX < width; pixelX++) {
     for (var pixelY = 0; pixelY < height; pixelY++) {
@@ -39,7 +69,7 @@ window.onload = function() {
         r: pixels[rIndex],
         g: pixels[gIndex],
         b: pixels[bIndex]
-      }) < 15) {
+      }) < 20) {
         newPixels[alphaIndex] = 128;
       } else {
         newPixels[alphaIndex] = 0;
@@ -61,10 +91,28 @@ window.onload = function() {
   context.drawImage(tempCanvas, 0, 0);
 }
 
-function colorDistance(color1, color2) {
-  var rSquare = Math.pow((color1.r - color2.r), 2);
-  var gSquare = Math.pow((color1.g - color2.g), 2);
-  var bSquare = Math.pow((color1.b - color2.b), 2);
-  var dist = Math.sqrt(rSquare + gSquare + bSquare);
-  return dist;
-}
+document.addEventListener("DOMContentLoaded", function(event) {
+
+  initialize();
+
+  //cwkTODO post-it yellow-ish
+  var targetColor = {
+    r: 140,
+    g: 136,
+    b: 88
+  }
+
+  var i = 0;
+
+  video.addEventListener('loadeddata', function() {
+   // Video is loaded and can be played
+   console.log("!!!")
+
+  //  i =0
+  //   while(i<100){
+      update(targetColor);
+        // i++
+    // }
+  }, false);
+
+})
