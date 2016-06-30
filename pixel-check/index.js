@@ -1,5 +1,7 @@
 var image, canvas, video, context;
 
+var useVideo = true;
+
 var initialize = function(){
   // setup video
   var video = document.querySelector("#videoElement");
@@ -24,9 +26,10 @@ var initialize = function(){
 
   canvas = document.createElement("canvas");
   context = canvas.getContext("2d");
-  debugger;
-  canvas.width = video.width;
-  canvas.height = video.height;
+  if (useVideo) {
+    canvas.width = video.width;
+    canvas.height = video.height;
+  }
   document.body.appendChild(canvas);
 }
 
@@ -45,8 +48,13 @@ var update = function(targetColor) {
   console.log(width)
   console.log(height)
 
-  context.drawImage(video, 0, 0, 200, 200);
-  var pixels = context.getImageData(0, 0, 200, 200).data;
+  if (useVideo) {
+    context.drawImage(video, 0, 0, 200, 200);
+    var pixels = context.getImageData(0, 0, 200, 200).data;
+  } else { // using sample image
+    context.drawImage(image, 0, 0, width, height);
+    var pixels = context.getImageData(0, 0, width, height).data;
+  }
 
   console.log(pixels)
 
