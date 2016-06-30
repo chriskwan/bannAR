@@ -1,5 +1,6 @@
 var useVideo = true;
-var minColorDistance = 50;
+//var minColorDistance = 5; // this is good for hsv
+var minColorDistance = 50; // this is good for rgb
 // var targetColor = {
 //   r: 211,
 //   g: 73,
@@ -12,9 +13,8 @@ var colorDistance = function(color1, color2) {
   // var hsv1 = rgb2hsv(color1.r, color1.g, color1.b);
   // var hsv2 = rgb2hsv(color2.r, color2.g, color2.b);
   // return Math.abs(hsv1.h - hsv2.h);
-  // debugger;
 
-  // Euclidean distance
+  // Compare rgb with Euclidean distance
   var rSquare = Math.pow((color1.r - color2.r), 2);
   var gSquare = Math.pow((color1.g - color2.g), 2);
   var bSquare = Math.pow((color1.b - color2.b), 2);
