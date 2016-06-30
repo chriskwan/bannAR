@@ -1,3 +1,5 @@
+var useVideo = true;
+
 var colorDistance = function(color1, color2) {
   var rSquare = Math.pow((color1.r - color2.r), 2);
   var gSquare = Math.pow((color1.g - color2.g), 2);
@@ -10,7 +12,14 @@ var update = function(context, frame, targetColor) {
   var width = context.canvas.width;
   var height = context.canvas.height;
 
-  context.drawImage(frame, 0, 0);
+  if (useVideo) {
+    context.drawImage(frame, 0, 0);
+  } else {
+    // using sample image
+    image = document.getElementById("sceneImage");
+    context.drawImage(image, 0, 0, width, height);
+  }
+
   var pixels = context.getImageData(0, 0, width, height).data;
   var newPixels = pixels;
 
