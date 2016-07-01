@@ -107,7 +107,7 @@
       renderer1 = new THREE.WebGLRenderer();
       renderer1.setClearColor(0xffff00, 1);
       renderer1.setSize(canvas.width, canvas.height);
-      document.getElementById("container1").appendChild(renderer1.domElement);
+      // document.getElementById("container1").appendChild(renderer1.domElement);
       scene1 = new THREE.Scene();
       camera1 = new THREE.PerspectiveCamera(40, canvas.width / canvas.height, 1, 1000);
       scene1.add(camera1);
@@ -115,7 +115,7 @@
       renderer2 = new THREE.WebGLRenderer();
       renderer2.setClearColor(0xffff00, 1);
       renderer2.setSize(canvas.width, canvas.height);
-      document.getElementById("container2").appendChild(renderer2.domElement);
+      // document.getElementById("container2").appendChild(renderer2.domElement);
       scene2 = new THREE.Scene();
       camera2 = new THREE.PerspectiveCamera(40, canvas.width / canvas.height, 1, 1000);
       scene2.add(camera2);
@@ -179,6 +179,8 @@
           material = new THREE.MeshBasicMaterial( {map: texture, depthTest: false, depthWrite: false} ),
           mesh = new THREE.Mesh(geometry, material);
 
+      texture.minFilter = THREE.LinearFilter;
+
       object.position.z = -1;
 
       object.add(mesh);
@@ -216,8 +218,8 @@
 
         pose = posit.pose(corners);
 
-        updateObject(plane1, pose.bestRotation, pose.bestTranslation);
-        updateObject(plane2, pose.alternativeRotation, pose.alternativeTranslation);
+        // updateObject(plane1, pose.bestRotation, pose.bestTranslation);
+        // updateObject(plane2, pose.alternativeRotation, pose.alternativeTranslation);
 
         // updateObject(model, pose.bestRotation, pose.bestTranslation);
 
@@ -233,8 +235,8 @@
             prevAlternativeRotation = pose.bestRotation
           }
 
-        updatePose("pose1", pose.bestError, pose.bestRotation, pose.bestTranslation);
-        updatePose("pose2", pose.alternativeError, pose.alternativeRotation, pose.alternativeTranslation);
+        // updatePose("pose1", pose.bestError, pose.bestRotation, pose.bestTranslation);
+        // updatePose("pose2", pose.alternativeError, pose.alternativeRotation, pose.alternativeTranslation);
 
         step += 0.025;
 
@@ -288,9 +290,9 @@
   <div style="margin: 10px;"><strong>-= Augmented Reality =-</strong></div>
   <div style="width: 100%;">
     <div style="width: 650px; margin-left:auto; margin-right:auto;">
-      <canvas id="canvas" style="width: 400px; height: 600px; float: left; border: solid 1px black;"></canvas>
+      <canvas id="canvas" style="width: 400px; height: 600px; float: left; border: solid 1px black;display:none;"></canvas>
       <div id="container" style="width: 400px; height: 600px; float: left; border: solid 1px black; background: green;"></div>
-      <div style="clear: both;"></div>
+      <!-- <div style="clear: both;"></div>
       <div style="float: left; border: solid 1px black;">
         <div id="container1" style="width: 400px; height: 600px; background: red;"></div>
         <div id="pose1"></div>
@@ -298,7 +300,7 @@
       <div style="float: left; border: solid 1px black;">
         <div id="container2" style="width: 400px; height: 600px; background: blue;"></div>
         <div id="pose2"></div>
-      </div>
+      </div> -->
     </div>
   </div>
   <div style="clear: both;"></div>
