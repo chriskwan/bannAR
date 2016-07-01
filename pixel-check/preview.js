@@ -1,16 +1,23 @@
 //var sku = "VIP-45694"; // "16x20 Poster - Matte Poster Stock - Normal/Blank"
 var sku = "VIP-47738"; // "ProductName": "Mug - 11 oz - White - Ceramic  - Green Accents "
 
-var sourceImage = "http://exmoorpet.com/wp-content/uploads/2012/08/cat.png";
+//Mario
+//https://upload.wikimedia.org/wikipedia/en/9/93/Tanooki_Mario.jpg
+
+var sourceImage = document.getElementById("previewInput").value || "http://exmoorpet.com/wp-content/uploads/2012/08/cat.png";
 var docUrl;
 var previewUrl;
 var previewWidth = 500;
+
+var previewImage = document.getElementById("previewImage");
 
 document.getElementById("previewBtn").addEventListener("click", function () {
   createDocument();
 });
 
 function createDocument() {
+
+  sourceImage = document.getElementById("previewInput").value || "http://exmoorpet.com/wp-content/uploads/2012/08/cat.png";
 
   var data = JSON.stringify(
       {
@@ -70,7 +77,8 @@ function getPreview() {
           //console.log("URL WORKED");
           //console.log(data);
           previewUrl = data.PreviewUrls[0];
-          console.log("previewUrl: " + previewUrl);
+          //console.log("previewUrl: " + previewUrl);
+          previewImage.src = previewUrl;
         }
     });
 }
