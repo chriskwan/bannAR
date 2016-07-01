@@ -8,6 +8,12 @@ var minColorDistance = 50; // this is good for rgb
 // };
 var targetColor = null;
 
+var boundingBox = null;
+var topmost = null;
+var leftmost = null;
+var rightmost = null;
+var bottommost = null;
+
 var colorDistance = function(color1, color2) {
   // Compare hsv -- this makes things slow!
   // var hsv1 = rgb2hsv(color1.r, color1.g, color1.b);
@@ -37,6 +43,11 @@ var update = function(context, frame, targetColor) {
   var pixels = context.getImageData(0, 0, width, height).data;
   var newPixels = pixels;
 
+  topmost = height-1;
+  leftmost = width-1;
+  rightmost = 0;
+  bottommost = 0;
+
   for (var pixelX = 0; pixelX < width; pixelX++) {
     for (var pixelY = 0; pixelY < height; pixelY++) {
       var pixelIndex = (pixelY * width + pixelX) * 4;
@@ -57,11 +68,49 @@ var update = function(context, frame, targetColor) {
           newPixels[bIndex] = 0;
           newPixels[alphaIndex] = 125;
 
-          //("diff: " + dist);
+          if (pixelY < topmost) {
+            topmost = pixelY;
+          }
+
+          if (pixelY > bottommost) {
+            bottommost = pixelY;
+          }
+
+          if (pixelX < leftmost) {
+            leftmost = pixelX;
+          }
+
+          if (pixelX > rightmost) {
+            rightmost = pixelX;
+          }
         }
       }
     }
   }
+
+  boundingBox = {
+    topLeft: {
+      x: leftmost,
+      y: topmost
+    },
+    bottomLeft: {
+      x: leftmost,
+      y: bottommost
+    },
+    topRight: {
+      x: rightmost,
+      y: topmost
+    },
+    bottomRight: {
+      x: rightmost,
+      y: bottommost
+    }
+  };
+
+  // console.log("topmost: " + topmost);
+  // console.log("bottommost: " + bottommost);
+  // console.log("leftmost: " + leftmost);
+  // console.log("rightmost: " + rightmost);
 
   var newImageData = context.createImageData(width, height);
   for (var i=0; i<pixels.length; i++) {
