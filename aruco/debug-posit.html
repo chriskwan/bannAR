@@ -153,11 +153,9 @@
     };
 
     function createModel(){
-
       THREE.ImageUtils.crossOrigin = '';
       var object = new THREE.Object3D(),
-          // texture = THREE.ImageUtils.loadTexture("textures/earth.jpg"),
-          texture = THREE.ImageUtils.loadTexture("http://rendering.documents.cimpress.io/v1/vcs/preview?width=500&instructions_uri=http:%2F%2Fuds.documents.cimpress.io%2Fv2%2Fmerchants%2Fvcs%2Fdocuments%2F2016hackathon-41d52fd7-4016-4a74-802b-cb4c578b2028%2Finstructions%3Ftoken%3Ddbf77d2e48af7ed70ffcae8259bcb997%26type%3Dpreview%26surface%3DFront"),
+          texture = THREE.ImageUtils.loadTexture("textures/earth.jpg"),
           material = new THREE.MeshBasicMaterial( {map: texture} ),
           geometry = new THREE.BoxGeometry( 10, 5, 1 );
 
@@ -278,9 +276,19 @@
     console.log(e.target.innerText)
     product = e.target.innerText;
 
-    mesh.geometry =  new THREE.PlaneGeometry(1.0, 1.0, 0.0);
-    // mesh.texture =
+    if(product == "Horizontal Banner"){
+      mesh.geometry =  new THREE.BoxGeometry( 10, 5, 0.1 );
+      mesh.material.color.setHex(0xff0000);
 
+    } else if(product == "Vertical Banner"){
+      mesh.geometry =  new THREE.BoxGeometry( 5, 10, 0.1 );
+      mesh.material.color.setHex(0x00ff00);
+    } else if(product == "Poster"){
+      mesh.geometry =  new THREE.BoxGeometry( 5, 5, 0.1 );
+      mesh.material.color.setHex(0x0000ff);
+    } else {
+      mesh.geometry =  new THREE.BoxGeometry( 2, 2, 0.1 );
+    }
   })
 
   $('.design-option').on('click', function(e){
