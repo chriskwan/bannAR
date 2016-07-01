@@ -117,6 +117,24 @@ var update = function(context, frame, targetColor) {
     newImageData.data[i] = newPixels[i];
   }
   context.putImageData(newImageData, 0, 0);
+
+  context.strokeStyle="#0000FF";
+  var rect = {
+    x: boundingBox.topLeft.x,
+    y: boundingBox.topLeft.y,
+    width: boundingBox.topRight.x - boundingBox.topLeft.x,
+    height: boundingBox.bottomLeft.y - boundingBox.topLeft.y
+  }
+  // var rect = {
+  //   x: 0,
+  //   y: 0,
+  //   width: 100,
+  //   height: 150
+  // }
+  //debugger;
+  if (rect.width > 0 && rect.height > 0) {
+    context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
