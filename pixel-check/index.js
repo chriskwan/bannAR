@@ -14,6 +14,11 @@ var leftmost = null;
 var rightmost = null;
 var bottommost = null;
 
+var searchSpaceXMin = null;
+var searchSpaceXMax = null;
+var searchSpaceYMin = null;
+var searchSpaceYMax = null;
+
 var colorDistance = function(color1, color2) {
   // Compare hsv -- this makes things slow!
   // var hsv1 = rgb2hsv(color1.r, color1.g, color1.b);
@@ -48,9 +53,14 @@ var update = function(context, frame, targetColor) {
   rightmost = 0;
   bottommost = 0;
 
+  var xMin = searchSpaceXMin || 0;
+  var xMax = searchSpaceXMax || width-1;
+  var yMin = searchSpaceYMin || 0;
+  var yMax = searchSpaceYMax || height-1;
+
   //cwkTODO change this width and height to be the search space
-  for (var pixelX = 0; pixelX < width; pixelX++) {
-    for (var pixelY = 0; pixelY < height; pixelY++) {
+  for (var pixelX = xMin; pixelX <= xMax; pixelX++) {
+    for (var pixelY = yMin; pixelY <= yMax; pixelY++) {
       var pixelIndex = (pixelY * width + pixelX) * 4;
       var rIndex = pixelIndex;
       var gIndex = pixelIndex + 1;
@@ -219,6 +229,7 @@ function findObject(event, video, context) {
   // while the queue has elements
   while (queue.length > 0) {
     // take the first element out of the queue
+    debugger;
     var pixel = queue[0];
     var pixelX = pixel.x;
     var pixelY = pixel.y;
@@ -256,19 +267,27 @@ function findObject(event, video, context) {
       }
 
       // for each neighbor
-      addNeighbor(queue, visited, width, height, x-1, y-1);
-      addNeighbor(queue, visited, width, height, x, y-1);
-      addNeighbor(queue, visited, width, height, x+1, y-1);
+      debugger;
+      addNeighbor(queue, visited, width, height, pixelX-1, pixelY-1);
+      addNeighbor(queue, visited, width, height, pixelX, pixelY-1);
+      addNeighbor(queue, visited, width, height, pixelX+1, pixelY-1);
 
-      addNeighbor(queue, visited, width, height, x-1, y);
-      addNeighbor(queue, visited, width, height, x+1, y);
+      addNeighbor(queue, visited, width, height, pixelX-1, pixelY);
+      addNeighbor(queue, visited, width, height, pixelX+1, pixelY);
 
-      addNeighbor(queue, visited, width, height, x-1, y+1);
-      addNeighbor(queue, visited, width, height, x, y+1);
-      addNeighbor(queue, visited, width, height, x+1, y+1);
+      addNeighbor(queue, visited, width, height, pixelX-1, pixelY+1);
+      addNeighbor(queue, visited, width, height, pixelX, pixelY+1);
+      addNeighbor(queue, visited, width, height, pixelX+1, pixelY+1);
     }
 
   } // end while
+
+  //debugger;
+
+  searchSpaceXMin = leftmost;
+  searchSpaceXMax = rightmost;
+  searchSpaceYMin = topmost;
+  searchSpaceYMax = bottommost;
 
   //debugger;
 
