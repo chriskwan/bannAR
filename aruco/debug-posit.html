@@ -193,7 +193,7 @@
           material = new THREE.MeshBasicMaterial( {map: texture} ),
           // mesh = new THREE.Mesh(geometry, material);
 
-          geometry = new THREE.BoxGeometry( 1, 2, 0.1 );
+          geometry = new THREE.BoxGeometry( 10, 5, 0.1 );
           // material = new THREE.MeshLambertMaterial( { color: 0xFF0000 } );
           mesh = new THREE.Mesh( geometry, material );
       object.add(mesh);
@@ -202,7 +202,7 @@
     };
 
     function updateScenes(markers){
-      var corners, corner, pose, i;
+      var corners, corner, pose, i, prevBestRotation;
 
       if (markers.length > 0){
         corners = markers[0].corners;
@@ -218,7 +218,20 @@
 
         updateObject(plane1, pose.bestRotation, pose.bestTranslation);
         updateObject(plane2, pose.alternativeRotation, pose.alternativeTranslation);
-        updateObject(model, pose.bestRotation, pose.bestTranslation);
+
+        // updateObject(model, pose.bestRotation, pose.bestTranslation);
+
+
+        if(!prevBestRotation || (((Math.abs(pose.bestRotation.x - prevBestRotation.x) + Math.abs(pose.bestRotation.y - prevBestRotation.y) + Math.abs(pose.bestRotation.z - prevBestRotation.z)) <
+          ((Math.abs(pose.bestRotation.x - prevAlternativeRotation.x) + Math.abs(pose.bestRotation.y - prevAlternativeRotation.y) + Math.abs(pose.bestRotation.z - prevAlternativeRotation.z)))))){
+            updateObject(model, pose.bestRotation, pose.bestTranslation);
+            prevBestRotation = pose.bestRotation;
+            prevAlternativeRotation = pose.alternativeRotation;
+          } else {
+            updateObject(model, pose.alternativeRotation, pose.alternativeTranslation);
+            prevBestRotation = pose.alternativeRotation;
+            prevAlternativeRotation = pose.bestRotation
+          }
 
         updatePose("pose1", pose.bestError, pose.bestRotation, pose.bestTranslation);
         updatePose("pose2", pose.alternativeError, pose.alternativeRotation, pose.alternativeTranslation);
@@ -242,7 +255,8 @@
 
       object.position.x = translation[0];
       object.position.y = translation[1];
-      object.position.z = -translation[2];
+      object.position.z = -translation[2] - 300;
+      console.log(translation[2])
     };
 
     function updatePose(id, error, rotation, translation){
@@ -269,21 +283,20 @@
 
 <body style="text-align: center; font-family: monospace;">
 
-  <video id="video" width=320 height=240 autoplay="true" style="display:none;"></video>
-  <video id="video" width=320 height=500 autoplay="true" style="display:none;"></video>
+  <video id="video" width=400 height=600 autoplay="true" style="display:none;"></video>
 
   <div style="margin: 10px;"><strong>-= Augmented Reality =-</strong></div>
   <div style="width: 100%;">
     <div style="width: 650px; margin-left:auto; margin-right:auto;">
-      <canvas id="canvas" style="width: 320px; height: 240px; float: left; border: solid 1px black;"></canvas>
-      <div id="container" style="width: 320px; height: 240px; float: left; border: solid 1px black; background: green;"></div>
+      <canvas id="canvas" style="width: 400px; height: 600px; float: left; border: solid 1px black;"></canvas>
+      <div id="container" style="width: 400px; height: 600px; float: left; border: solid 1px black; background: green;"></div>
       <div style="clear: both;"></div>
       <div style="float: left; border: solid 1px black;">
-        <div id="container1" style="width: 320px; height: 240px; background: red;"></div>
+        <div id="container1" style="width: 400px; height: 600px; background: red;"></div>
         <div id="pose1"></div>
       </div>
       <div style="float: left; border: solid 1px black;">
-        <div id="container2" style="width: 320px; height: 240px; background: blue;"></div>
+        <div id="container2" style="width: 400px; height: 600px; background: blue;"></div>
         <div id="pose2"></div>
       </div>
     </div>
