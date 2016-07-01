@@ -1,7 +1,10 @@
-var sku = "VIP-45694"; // "16x20 Poster - Matte Poster Stock - Normal/Blank"
+//var sku = "VIP-45694"; // "16x20 Poster - Matte Poster Stock - Normal/Blank"
+var sku = "VIP-47738"; // "ProductName": "Mug - 11 oz - White - Ceramic  - Green Accents "
+
 var sourceImage = "http://exmoorpet.com/wp-content/uploads/2012/08/cat.png";
 var docUrl;
 var previewUrl;
+var previewWidth = 500;
 
 document.getElementById("previewBtn").addEventListener("click", function () {
   createDocument();
@@ -20,7 +23,7 @@ function createDocument() {
         "Sku": sku
       }
     );
-    console.log(data);
+    //console.log(data);
 
     $.ajax({
         url: 'https://api.cimpress.io/vcs/printapi/v1/documents/creators/url',
@@ -32,8 +35,8 @@ function createDocument() {
         },
         data: data,
         success: function(data, status) {
-          console.log("URL WORKED");
-          console.log(data);
+          //console.log("URL WORKED");
+          //console.log(data);
           docUrl = data.InstructionSourceUrl;
           getPreview();
         }
@@ -52,10 +55,10 @@ function getPreview() {
         "Sku": sku
       }
     );
-    console.log(data);
+    //console.log(data);
 
     $.ajax({
-        url: 'https://api.cimpress.io/vcs/printapi/v1/documents/previews?Sku=' + sku + '&InstructionSourceUrl=' + docUrl + '&Width=100',
+        url: 'https://api.cimpress.io/vcs/printapi/v1/documents/previews?Sku=' + sku + '&InstructionSourceUrl=' + docUrl + '&Width=' + previewWidth,
         method: 'GET',
         headers : {
           'Accept': 'application/json',
@@ -64,8 +67,8 @@ function getPreview() {
         },
         data: data,
         success: function(data, status) {
-          console.log("URL WORKED");
-          console.log(data);
+          //console.log("URL WORKED");
+          //console.log(data);
           previewUrl = data.PreviewUrls[0];
           console.log("previewUrl: " + previewUrl);
         }
