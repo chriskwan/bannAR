@@ -1,12 +1,22 @@
 <html>
   <head>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   </head>
   <body>
-    <canvas id="myvid" width="500px" height="500px"></canvas>
+    <input id="previewInput" type="text" value=""/>
+    <button id="previewBtn">Preview</button>
+    <img id="previewImage"/>
 
+    <div id="container">
+        <input type="checkbox" id="togglez" />
+    </div>
+
+    <script src="preview.js"></script>
     <script src="camvas.js"></script>
-    <script src="three.min.js"></script>1
+    <script src="three.min.js"></script>
     <script src="DeviceOrientationController.js"></script>
     <script src="index.js"></script>
+    <script src="gl.js"></script>
   </body>
 </html>

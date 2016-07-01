@@ -14,6 +14,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 // nightly build, you don't deserve exceptions.
 window.URL = window.URL || window.webkitURL
 
+// MediaDevices.getUserMedia({ audio: false, video: { facingMode: { exact: "environment" } } })
+
 navigator.getUserMedia  = navigator.getUserMedia ||
                           navigator.webkitGetUserMedia ||
                           navigator.mozGetUserMedia ||
@@ -52,6 +54,8 @@ function camvas(ctx, drawFunc) {
   document.body.appendChild(streamContainer)
 
   // The callback happens when we are starting to stream the video.
+  // Rear facing camera not supported in android chrome, but works in firefox
+  //     http://stackoverflow.com/questions/32086122/getusermedia-facingmode
   navigator.getUserMedia({video: { facingMode: { exact: "environment" } }}, function(stream) {
     // Yay, now our webcam input is treated as a normal video and
     // we can start having fun

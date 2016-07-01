@@ -1,0 +1,30 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+#container {
+  position: relative;
+}
+
+#container canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-top: 20px;
+}
+
+.appbar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: aliceblue;
+}
+
+#togglez {
+  z-index: 100;
+}
+
+#togglez:checked + #video {
+    z-index: 10;
+}

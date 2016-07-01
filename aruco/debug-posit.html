@@ -1,0 +1,430 @@
+<html>
+
+<head style="padding:0; margin:0">
+  <title>Bannar</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="https://code.jquery.com/jquery-3.0.0.min.js" integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0=" crossorigin="anonymous"></script>
+
+  <!-- Compiled and minified CSS -->
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+
+ <!-- Compiled and minified JavaScript -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+
+ <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+
+  <script type="text/javascript" src="libs/Three.js"></script>
+
+  <script type="text/javascript" src="svd.js"></script>
+  <script type="text/javascript" src="posit1.js"></script>
+  <script type="text/javascript" src="cv.js"></script>
+  <script type="text/javascript" src="aruco.js"></script>
+
+
+  <script>
+    var video, canvas, context, imageData, detector, posit;
+    var renderer1, renderer2, renderer;
+    var scene1, scene2, scene, scene4;
+    var camera1, camera2, camera3, camera4;
+    var plane1, plane2, model, texture;
+    var product = "Horizontal Banner";
+    var design = "1";
+    var mesh
+    var step = 0.0;
+
+    var textureUrl = "http://www.vistaprint.com/plt/preview/studio.aspx?storageid=651773823"
+
+    var modelSize = 35.0; //millimeters
+
+    function onLoad(){
+      video = document.getElementById("video");
+      canvas = document.getElementById("canvas");
+      context = canvas.getContext("2d");
+
+      canvas.width = parseInt(canvas.style.width);
+      canvas.height = parseInt(canvas.style.height);
+
+      navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+      if (navigator.getUserMedia){
+        init();
+      }
+    };
+
+    function init(){
+      navigator.getUserMedia({video:true},
+        function (stream){
+          if (window.webkitURL) {
+            video.src = window.webkitURL.createObjectURL(stream);
+          } else if (video.mozSrcObject !== undefined) {
+            video.mozSrcObject = stream;
+          } else {
+            video.src = stream;
+          }
+        },
+        function(error){
+        }
+      );
+
+      detector = new AR.Detector();
+      posit = new POS.Posit(modelSize, canvas.width);
+
+      createRenderers();
+      createScenes();
+
+      requestAnimationFrame(tick);
+    };
+
+    function tick(){
+      requestAnimationFrame(tick);
+
+      if (video.readyState === video.HAVE_ENOUGH_DATA){
+        snapshot();
+
+        var markers = detector.detect(imageData);
+        updateScenes(markers);
+
+        render();
+      }
+    };
+
+    function snapshot(){
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    };
+
+    function createRenderers(){
+      renderer = new THREE.WebGLRenderer();
+      renderer.setClearColor(0xffffff, 1);
+      renderer.setSize(canvas.width, canvas.height);
+      document.getElementById("container").appendChild(renderer.domElement);
+
+      scene = new THREE.Scene();
+      camera3 = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5);
+      scene.add(camera3);
+
+      scene4 = new THREE.Scene();
+      camera4 = new THREE.PerspectiveCamera(40, canvas.width / canvas.height, 1, 1000);
+      scene4.add(camera4);
+    };
+
+    function render(){
+      renderer.autoClear = false;
+      renderer.clear();
+      renderer.render(scene, camera3);
+      renderer.render(scene4, camera4);
+    };
+
+    function createScenes(){
+      texture = createTexture();
+      scene.add(texture);
+
+      model = createModel();
+      scene4.add(model);
+    };
+
+    function createPlane(){
+      var object = new THREE.Object3D(),
+          geometry = new THREE.PlaneGeometry(1.0, 1.0, 0.0),
+          material = new THREE.MeshNormalMaterial(),
+          mesh = new THREE.Mesh(geometry, material);
+
+      object.add(mesh);
+
+      return object;
+    };
+
+    function createTexture(){
+      var texture = new THREE.Texture(video),
+          object = new THREE.Object3D(),
+          geometry = new THREE.PlaneGeometry(1.0, 1.0, 0.0),
+          material = new THREE.MeshBasicMaterial( {map: texture, depthTest: false, depthWrite: false} ),
+          mesh = new THREE.Mesh(geometry, material);
+
+      // supress warnings
+      texture.minFilter = THREE.LinearFilter;
+
+      object.position.z = -1;
+
+      object.add(mesh);
+
+      return object;
+    };
+
+    function createModel(){
+      THREE.ImageUtils.crossOrigin = '';
+      var object = new THREE.Object3D(),
+          texture = THREE.ImageUtils.loadTexture("textures/cimpressbanner.png"),
+          material = new THREE.MeshBasicMaterial( {map: texture} ),
+          geometry = new THREE.BoxGeometry( 10, 5, 1 );
+
+      mesh = new THREE.Mesh( geometry, material );
+      object.add(mesh);
+
+      return object;
+    };
+
+    function updateScenes(markers){
+      var corners, corner, pose, i, prevBestRotation;
+
+      if (markers.length > 0){
+        corners = markers[0].corners;
+
+        for (i = 0; i < corners.length; ++ i){
+          corner = corners[i];
+
+          corner.x = corner.x - (canvas.width / 2);
+          corner.y = (canvas.height / 2) - corner.y;
+        }
+
+        pose = posit.pose(corners);
+
+        if(!prevBestRotation || (((Math.abs(pose.bestRotation.x - prevBestRotation.x) + Math.abs(pose.bestRotation.y - prevBestRotation.y) + Math.abs(pose.bestRotation.z - prevBestRotation.z)) <
+          ((Math.abs(pose.bestRotation.x - prevAlternativeRotation.x) + Math.abs(pose.bestRotation.y - prevAlternativeRotation.y) + Math.abs(pose.bestRotation.z - prevAlternativeRotation.z)))))){
+            updateObject(model, pose.bestRotation, pose.bestTranslation);
+            prevBestRotation = pose.bestRotation;
+            prevAlternativeRotation = pose.alternativeRotation;
+          } else {
+            updateObject(model, pose.alternativeRotation, pose.alternativeTranslation);
+            prevBestRotation = pose.alternativeRotation;
+            prevAlternativeRotation = pose.bestRotation
+          }
+      }
+
+      texture.children[0].material.map.needsUpdate = true;
+    };
+
+    function updateObject(object, rotation, translation){
+      // TODO set material texture
+      // mesh.material.color.setHex(0xff0000);
+      // mesh.material = new
+
+      object.scale.x = modelSize;
+      object.scale.y = modelSize;
+      object.scale.z = modelSize;
+
+      object.rotation.x = -Math.asin(-rotation[1][2]);
+      object.rotation.y = -Math.atan2(rotation[0][2], rotation[2][2]);
+      object.rotation.z = Math.atan2(rotation[1][0], rotation[1][1]);
+
+      object.position.x = translation[0];
+      object.position.y = translation[1];
+      object.position.z = -translation[2] - 300;
+    };
+
+    window.onload = onLoad;
+  </script>
+
+</head>
+
+<body style="text-align: center; font-family: monospace; padding:0; margin:0">
+  <!-- Side Navigation -->
+  <div class="navbar-fixed">
+    <nav class="blue">
+      <ul id="slide-out" class="side-nav">
+        <li class="no-padding">
+          <ul class="collapsible collapsible-accordion">
+            <li>
+              <a class="collapsible-header">Products<i class="material-icons">arrow_drop_down</i></a>
+              <div class="collapsible-body">
+                <ul  class="collection">
+                  <li  class="collection-item product-option"><a href="#!">Banner (H)</a></li>
+                  <li  class="collection-item product-option"><a href="#!">Banner (V)</a></li>
+                  <li  class="collection-item product-option"><a href="#!">Poster</a></li>
+                  <li  class="collection-item product-option"><a href="#!">Canvas</a></li>
+                  <li  class="collection-item product-option"><a href="#!">Mug</a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </li>
+        <li class="no-padding">
+          <ul class="collapsible collapsible-accordion">
+            <li>
+              <a class="collapsible-header">Designs<i class="material-icons">arrow_drop_down</i></a>
+              <div class="collapsible-body">
+                <ul class="collection">
+                  <li class="collection-item design-option"><a href="#!">America</a></li>
+                  <li class="collection-item design-option"><a href="#!">Opening</a></li>
+                  <li class="collection-item design-option"><a href="#!">Globe</a></li>
+                  <li class="collection-item design-option"><a href="#!">Dream</a></li>
+                  <li class="collection-item design-option"><a href="#!">Mystery</a></li>
+                  <li class="collection-item design-option"><a href="#!">Birthday</a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </li>
+        <li class="no-padding">
+          <ul class="collapsible collapsible-accordion">
+            <li>
+              <a class="collapsible-header">Filters<i class="material-icons">arrow_drop_down</i></a>
+              <div class="collapsible-body">
+                <ul class="collection">
+                  <li class="collection-item filter-option"><a href="#!">Green</a></li>
+                  <li class="collection-item filter-option"><a href="#!">Blue</a></li>
+                  <li class="collection-item filter-option"><a href="#!">Red</a></li>
+                  <li class="collection-item filter-option"><a href="#!">Clear</a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#!">Settings</a></li>
+        <li><a href="#!">About</a></li>
+      </ul>
+      <a href="#" data-activates="slide-out" class="button-collapse"><i class="material-icons">menu</i></a>
+      <a href="#!" class="brand-logo">bannAR</a>
+      <!-- <a href="#" data-activates="slide-out" class="button-collapse show-on-large"><i class="material-icons">menu</i></i></a> -->
+    </nav>
+  </div>
+
+  <div class="row upload">
+    <div class="input-field">
+      <input value="" id="previewInput" type="text">
+      <label class="active" for="previewInput">Link to your Design:</label>
+    </div>
+  </div>
+  <div class="fixed-action-btn" style="bottom: 45px; right: 24px;">
+    <!-- <a class="btn-floating btn-large waves-effect blue">
+      <i class="large material-icons">edit</i>
+    </a> -->
+    <a class="btn-floating btn-large waves-effect blue" id="previewBtn">
+      <i class="large material-icons">arrow_forward</i>
+    </a>
+  </div>
+
+  <script>
+  // Initialize collapse button
+  $(".button-collapse").sideNav();
+  // Initialize collapsible (uncomment the line below if you use the dropdown variation)
+  $('.collapsible').collapsible();
+
+  $('.product-option').on('click', function(e){
+    console.log(e.target.innerText)
+    product = e.target.innerText;
+
+    function getBase64Image(img) {
+        // Create an empty canvas element
+        var c = document.createElement("canvas");
+        c.width = img.width;
+        c.height = img.height;
+
+        // Copy the image contents to the canvas
+        var ctx = c.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+
+        // Get the data-URL formatted image
+        // Firefox supports PNG and JPEG. You could check img.src to
+        // guess the original format, but be aware the using "image/jpg"
+        // will re-encode the image.
+        var dataURL = canvas.toDataURL("image/png");
+
+        return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+    }
+
+    if(product == "Banner (H)"){
+      mesh.geometry =  new THREE.BoxGeometry( 10, 5, 0.1 );
+      // var i = $("#previewImage")[0];
+      // var idatau
+      // try {
+      //   idatau = getBase64Image(i);
+      // } catch (e) {
+      //   idatau = document.getElementById("previewInput").value || "http://exmoorpet.com/wp-content/uploads/2012/08/cat.png";
+      // }
+      // debugger;
+
+      // var txt = new THREE.Texture( idatau );
+      // THREE.ImageUtils.crossOrigin = '';
+      // var txt = THREE.ImageUtils.loadTexture("http://www.vistaprint.com/plt/preview/studio.aspx?storageid=651870126")
+      // txt.needsUpdate = true;
+      // mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
+
+      // var imageElement = document.createElement('img');
+      // imageElement.onload = function(e) {
+      // };
+      // imageElement.src = "http://exmoorpet.com/wp-content/uploads/2012/08/cat.png";
+
+    } else if(product == "Banner (V)"){
+      mesh.geometry =  new THREE.BoxGeometry( 5, 10, 0.1 );
+
+    } else if(product == "Poster"){
+      mesh.geometry =  new THREE.BoxGeometry( 5, 5, 0.1 );
+
+    } else if(product == "Canvas"){
+      mesh.geometry =  new THREE.BoxGeometry( 6, 6, 1 );
+
+    } else if(product == "Mug"){
+        var loader = new THREE.JSONLoader();
+        loader.load( 'mug.json', function ( geometry ) {
+          mesh.geometry = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial() );
+        });
+    } else {
+      mesh.geometry =  new THREE.BoxGeometry( 2, 2, 0.1 );
+    }
+  })
+
+  $('.design-option').on('click', function(e){
+    console.log(e.target.innerText)
+    design = e.target.innerText;
+
+    if(design == "Globe") {
+      var txt = THREE.ImageUtils.loadTexture("textures/earth.jpg")
+      mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
+    } else if(design == "America") {
+      var txt = THREE.ImageUtils.loadTexture("textures/cimpressbanner.png")
+      mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
+    } else if(design == "Opening") {
+      var txt = THREE.ImageUtils.loadTexture("textures/cimpressbanner2.png")
+      mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
+    } else if(design == "Dream") {
+      var txt = THREE.ImageUtils.loadTexture("textures/cimpressbanner3.png")
+      mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
+    } else if(design == "Mystery") {
+      var txt = THREE.ImageUtils.loadTexture("textures/cimpressbanner4.png")
+      mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
+    } else if(design == "Birthday") {
+      var txt = THREE.ImageUtils.loadTexture("textures/cimpressbanner5.png")
+      mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
+    } else {
+      mesh.material.color.setHex(0xffffff);
+    }
+  })
+
+  $('.filter-option').on('click', function(e){
+    console.log(e.target.innerText)
+    filter = e.target.innerText;
+
+    if(filter == "Green"){
+      mesh.material.color.setHex(0x00cc00);
+    } else if(filter =="Blue") {
+      mesh.material.color.setHex(0x0000cc);
+    }else if(filter == "Red") {
+      mesh.material.color.setHex(0xcc0000);
+    } else {
+      mesh.material.color.setHex(0xffffff);
+    }
+  })
+
+  $(".edit").on("click", function(e){
+    $(".upload").show();
+  })
+
+  </script>
+
+
+  <video id="video" width=400 height=520 autoplay="true" style="display:none;"></video>
+
+  <div style="width: 100%;">
+    <div style="width: 650px; margin-left:auto; margin-right:auto; ">
+      <canvas id="canvas" style="width: 400px; height: 520px; float: left; border: solid 1px black;display:none;"></canvas>
+      <div id="container" style="width: 400px; height: 520px; float: left;"></div>
+    </div>
+  </div>
+  <img id="previewImage"/>
+<script type="text/javascript" src="preview.js"></script>
+</body>
+
+</html>
