@@ -156,7 +156,7 @@
     function createModel(){
       THREE.ImageUtils.crossOrigin = '';
       var object = new THREE.Object3D(),
-          texture = THREE.ImageUtils.loadTexture("textures/earth.jpg"),
+          texture = THREE.ImageUtils.loadTexture("textures/cimpressbanner.png"),
           material = new THREE.MeshBasicMaterial( {map: texture} ),
           geometry = new THREE.BoxGeometry( 10, 5, 1 );
 
@@ -230,9 +230,10 @@
               <a class="collapsible-header">Products<i class="material-icons">arrow_drop_down</i></a>
               <div class="collapsible-body">
                 <ul  class="collection">
-                  <li  class="collection-item product-option"><a href="#!">Horizontal Banner</a></li>
-                  <li  class="collection-item product-option"><a href="#!">Vertical Banner</a></li>
+                  <li  class="collection-item product-option"><a href="#!">Banner (H)</a></li>
+                  <li  class="collection-item product-option"><a href="#!">Banner (V)</a></li>
                   <li  class="collection-item product-option"><a href="#!">Poster</a></li>
+                  <li  class="collection-item product-option"><a href="#!">Canvas</a></li>
                   <li  class="collection-item product-option"><a href="#!">Mug</a></li>
                 </ul>
               </div>
@@ -245,9 +246,27 @@
               <a class="collapsible-header">Designs<i class="material-icons">arrow_drop_down</i></a>
               <div class="collapsible-body">
                 <ul class="collection">
-                  <li class="collection-item design-option"><a href="#!">Green</a></li>
-                  <li class="collection-item design-option"><a href="#!">Blue</a></li>
-                  <li class="collection-item design-option"><a href="#!">Red</a></li>
+                  <li class="collection-item design-option"><a href="#!">America</a></li>
+                  <li class="collection-item design-option"><a href="#!">Opening</a></li>
+                  <li class="collection-item design-option"><a href="#!">Globe</a></li>
+                  <li class="collection-item design-option"><a href="#!">Dream</a></li>
+                  <li class="collection-item design-option"><a href="#!">Mystery</a></li>
+                  <li class="collection-item design-option"><a href="#!">Birthday</a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </li>
+        <li class="no-padding">
+          <ul class="collapsible collapsible-accordion">
+            <li>
+              <a class="collapsible-header">Filters<i class="material-icons">arrow_drop_down</i></a>
+              <div class="collapsible-body">
+                <ul class="collection">
+                  <li class="collection-item filter-option"><a href="#!">Green</a></li>
+                  <li class="collection-item filter-option"><a href="#!">Blue</a></li>
+                  <li class="collection-item filter-option"><a href="#!">Red</a></li>
+                  <li class="collection-item filter-option"><a href="#!">Clear</a></li>
                 </ul>
               </div>
             </li>
@@ -306,34 +325,42 @@
         return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
     }
 
-    if(product == "Horizontal Banner"){
+    if(product == "Banner (H)"){
       mesh.geometry =  new THREE.BoxGeometry( 10, 5, 0.1 );
-      var i = $("#previewImage")[0];
-      var idatau
-      try {
-        idatau = getBase64Image(i);
-      } catch (e) {
-        idatau = document.getElementById("previewInput").value || "http://exmoorpet.com/wp-content/uploads/2012/08/cat.png";
-      }
-      debugger;
+      // var i = $("#previewImage")[0];
+      // var idatau
+      // try {
+      //   idatau = getBase64Image(i);
+      // } catch (e) {
+      //   idatau = document.getElementById("previewInput").value || "http://exmoorpet.com/wp-content/uploads/2012/08/cat.png";
+      // }
+      // debugger;
 
       // var txt = new THREE.Texture( idatau );
-      THREE.ImageUtils.crossOrigin = '';
-      var txt = THREE.ImageUtils.loadTexture("http://exmoorpet.com/wp-content/uploads/2012/08/cat.png")
-      txt.needsUpdate = true;
-      mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
+      // THREE.ImageUtils.crossOrigin = '';
+      // var txt = THREE.ImageUtils.loadTexture("http://www.vistaprint.com/plt/preview/studio.aspx?storageid=651870126")
+      // txt.needsUpdate = true;
+      // mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
 
       // var imageElement = document.createElement('img');
       // imageElement.onload = function(e) {
       // };
       // imageElement.src = "http://exmoorpet.com/wp-content/uploads/2012/08/cat.png";
 
-    } else if(product == "Vertical Banner"){
+    } else if(product == "Banner (V)"){
       mesh.geometry =  new THREE.BoxGeometry( 5, 10, 0.1 );
-      mesh.material.color.setHex(0x00ff00);
+
     } else if(product == "Poster"){
       mesh.geometry =  new THREE.BoxGeometry( 5, 5, 0.1 );
-      mesh.material.color.setHex(0x0000ff);
+
+    } else if(product == "Canvas"){
+      mesh.geometry =  new THREE.BoxGeometry( 6, 6, 1 );
+
+    } else if(product == "Mug"){
+        var loader = new THREE.JSONLoader();
+        loader.load( 'mug.json', function ( geometry ) {
+          mesh.geometry = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial() );
+        });
     } else {
       mesh.geometry =  new THREE.BoxGeometry( 2, 2, 0.1 );
     }
@@ -342,8 +369,44 @@
   $('.design-option').on('click', function(e){
     console.log(e.target.innerText)
     design = e.target.innerText;
+
+    if(design == "Globe") {
+      var txt = THREE.ImageUtils.loadTexture("textures/earth.jpg")
+      mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
+    } else if(design == "America") {
+      var txt = THREE.ImageUtils.loadTexture("textures/cimpressbanner.png")
+      mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
+    } else if(design == "Opening") {
+      var txt = THREE.ImageUtils.loadTexture("textures/cimpressbanner2.png")
+      mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
+    } else if(design == "Dream") {
+      var txt = THREE.ImageUtils.loadTexture("textures/cimpressbanner3.png")
+      mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
+    } else if(design == "Mystery") {
+      var txt = THREE.ImageUtils.loadTexture("textures/cimpressbanner4.png")
+      mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
+    } else if(design == "Birthday") {
+      var txt = THREE.ImageUtils.loadTexture("textures/cimpressbanner5.png")
+      mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
+    } else {
+      mesh.material.color.setHex(0xffffff);
+    }
   })
 
+  $('.filter-option').on('click', function(e){
+    console.log(e.target.innerText)
+    filter = e.target.innerText;
+
+    if(filter == "Green"){
+      mesh.material.color.setHex(0x00ff00);
+    } else if(filter =="Blue") {
+      mesh.material.color.setHex(0x0000ff);
+    }else if(filter == "Red") {
+      mesh.material.color.setHex(0xff0000);
+    } else {
+      mesh.material.color.setHex(0xffffff);
+    }
+  })
 
   $(".edit").on("click", function(e){
     $(".upload").show();
