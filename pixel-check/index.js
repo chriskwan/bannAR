@@ -48,6 +48,7 @@ var update = function(context, frame, targetColor) {
   rightmost = 0;
   bottommost = 0;
 
+  //cwkTODO change this width and height to be the search space
   for (var pixelX = 0; pixelX < width; pixelX++) {
     for (var pixelY = 0; pixelY < height; pixelY++) {
       var pixelIndex = (pixelY * width + pixelX) * 4;
@@ -125,13 +126,7 @@ var update = function(context, frame, targetColor) {
     width: boundingBox.topRight.x - boundingBox.topLeft.x,
     height: boundingBox.bottomLeft.y - boundingBox.topLeft.y
   }
-  // var rect = {
-  //   x: 0,
-  //   y: 0,
-  //   width: 100,
-  //   height: 150
-  // }
-  //debugger;
+
   if (rect.width > 0 && rect.height > 0) {
     context.strokeRect(rect.x, rect.y, rect.width, rect.height);
   }
@@ -160,7 +155,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
   var myCamvas = new camvas(context, draw);
 
   myVid.addEventListener("click", function(event) {
-    return getColor(event, myVid, context);
+    getColor(event, myVid, context);
+    findObject(event, myVid, context);
   });
 });
 
@@ -191,6 +187,146 @@ function getColor(event, video, context) {
       }
     }
   }
+}
+
+// Find an object by spiraling outwards from a point
+function findObject(event, video, context) {
+  var x = event.offsetX;
+  var y = event.offsetY;
+
+  var width = video.width;
+  var height = video.height;
+  var imageData = context.getImageData(0, 0, video.width, video.height);
+  var pixels = imageData.data;
+
+  topmost = height-1;
+  leftmost = width-1;
+  rightmost = 0;
+  bottommost = 0;
+
+  // whether a pixel has been visited
+  // e.g. visited["1,1"] == true
+  var visited = {};
+
+  var queue = [];
+
+  // push the pixel onto the stack
+  queue.push({
+    x: x,
+    y: y,
+  });
+
+  // while the queue has elements
+  while (queue.length > 0) {
+    // take the first element out of the queue
+    var pixel = queue[0];
+    var pixelX = pixel.x;
+    var pixelY = pixel.y;
+    queue = queue.slice(1); // remove first element
+
+    // mark the pixel as being visited
+    var key = pixel.x + "," + pixel.y;
+    visited[key] = true;
+
+    // if it is the correct color
+    var pixelIndex = (pixel.y * width + pixel.x) * 4;
+    var pixelColor = {
+      r: pixels[pixelIndex],
+      g: pixels[pixelIndex + 1],
+      b: pixels[pixelIndex + 2]
+    }
+
+    var dist = colorDistance(targetColor, pixelColor);
+    if (dist < minColorDistance) {
+      // check if it is one of the topmost, etc elements
+      if (pixelY < topmost) {
+        topmost = pixelY;
+      }
+
+      if (pixelY > bottommost) {
+        bottommost = pixelY;
+      }
+
+      if (pixelX < leftmost) {
+        leftmost = pixelX;
+      }
+
+      if (pixelX > rightmost) {
+        rightmost = pixelX;
+      }
+
+      // for each neighbor
+      addNeighbor(queue, visited, width, height, x-1, y-1);
+      addNeighbor(queue, visited, width, height, x, y-1);
+      addNeighbor(queue, visited, width, height, x+1, y-1);
+
+      addNeighbor(queue, visited, width, height, x-1, y);
+      addNeighbor(queue, visited, width, height, x+1, y);
+
+      addNeighbor(queue, visited, width, height, x-1, y+1);
+      addNeighbor(queue, visited, width, height, x, y+1);
+      addNeighbor(queue, visited, width, height, x+1, y+1);
+    }
+
+  } // end while
+
+  //debugger;
+
+  boundingBox = {
+    topLeft: {
+      x: leftmost,
+      y: topmost
+    },
+    bottomLeft: {
+      x: leftmost,
+      y: bottommost
+    },
+    topRight: {
+      x: rightmost,
+      y: topmost
+    },
+    bottomRight: {
+      x: rightmost,
+      y: bottommost
+    }
+  };
+
+  context.strokeStyle="#0000FF";
+  var rect = {
+    x: boundingBox.topLeft.x,
+    y: boundingBox.topLeft.y,
+    width: boundingBox.topRight.x - boundingBox.topLeft.x,
+    height: boundingBox.bottomLeft.y - boundingBox.topLeft.y
+  }
+
+  if (rect.width > 0 && rect.height > 0) {
+    context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+  }
+
+}
+
+function addNeighbor(queue, visited, width, height, x, y) {
+  // if neighbor is valid coordinate
+  if (x < 0 || x >= width) {
+    return;
+  }
+
+  if (y < 0 || y >= height) {
+    return;
+  }
+
+  // if neighbor has not been added already
+  var key = x + "," + y;
+  if (visited[key]) {
+    return;
+  }
+
+  // if neighbor is correct color
+  // add it to the queue
+  queue.push({
+    x: x,
+    y: y
+  })
 }
 
 // Ref: http://stackoverflow.com/a/8023734
