@@ -5,6 +5,17 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <script src="https://code.jquery.com/jquery-3.0.0.min.js" integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0=" crossorigin="anonymous"></script>
+
+  <!-- Compiled and minified CSS -->
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+
+ <!-- Compiled and minified JavaScript -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+
+ <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+
   <script type="text/javascript" src="libs/Three.js"></script>
 
   <script type="text/javascript" src="svd.js"></script>
@@ -18,6 +29,8 @@
     var scene1, scene2, scene, scene4;
     var camera1, camera2, camera3, camera4;
     var plane1, plane2, model, texture;
+    var product = "Horizontal Banner";
+    var design = "1";
     var mesh
     var step = 0.0;
 
@@ -141,8 +154,10 @@
 
     function createModel(){
 
+      THREE.ImageUtils.crossOrigin = '';
       var object = new THREE.Object3D(),
-          texture = THREE.ImageUtils.loadTexture("textures/earth.jpg"),
+          // texture = THREE.ImageUtils.loadTexture("textures/earth.jpg"),
+          texture = THREE.ImageUtils.loadTexture("http://rendering.documents.cimpress.io/v1/vcs/preview?width=500&instructions_uri=http:%2F%2Fuds.documents.cimpress.io%2Fv2%2Fmerchants%2Fvcs%2Fdocuments%2F2016hackathon-41d52fd7-4016-4a74-802b-cb4c578b2028%2Finstructions%3Ftoken%3Ddbf77d2e48af7ed70ffcae8259bcb997%26type%3Dpreview%26surface%3DFront"),
           material = new THREE.MeshBasicMaterial( {map: texture} ),
           geometry = new THREE.BoxGeometry( 10, 5, 1 );
 
@@ -205,13 +220,83 @@
 </head>
 
 <body style="text-align: center; font-family: monospace; padding:0; margin:0">
+  <!-- Side Navigation -->
+  <div class="navbar-fixed">
+    <nav class="blue">
+      <ul id="slide-out" class="side-nav">
+        <li class="no-padding">
+          <ul class="collapsible collapsible-accordion">
+            <li>
+              <a class="collapsible-header">Products<i class="material-icons">arrow_drop_down</i></a>
+              <div class="collapsible-body">
+                <ul  class="collection">
+                  <li  class="collection-item product-option"><a href="#!">Horizontal Banner</a></li>
+                  <li  class="collection-item product-option"><a href="#!">Vertical Banner</a></li>
+                  <li  class="collection-item product-option"><a href="#!">Poster</a></li>
+                  <li  class="collection-item product-option"><a href="#!">Mug</a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </li>
+        <li class="no-padding">
+          <ul class="collapsible collapsible-accordion">
+            <li>
+              <a class="collapsible-header">Designs<i class="material-icons">arrow_drop_down</i></a>
+              <div class="collapsible-body">
+                <ul class="collection">
+                  <li class="collection-item design-option"><a href="#!">Green</a></li>
+                  <li class="collection-item design-option"><a href="#!">Blue</a></li>
+                  <li class="collection-item design-option"><a href="#!">Red</a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#!">Settings</a></li>
+        <li><a href="#!">About</a></li>
+      </ul>
+      <a href="#" data-activates="slide-out" class="button-collapse"><i class="material-icons">menu</i></a>
+      <a href="#!" class="brand-logo">bannAR</a>
+      <!-- <a href="#" data-activates="slide-out" class="button-collapse show-on-large"><i class="material-icons">menu</i></i></a> -->
+    </nav>
+  </div>
 
-  <video id="video" width=400 height=500 autoplay="true" style="display:none;"></video>
+  <div class="fixed-action-btn" style="bottom: 45px; right: 24px;">
+    <a class="btn-floating btn-large waves-effect blue">
+      <i class="large material-icons">arrow_forward</i>
+    </a>
+  </div>
+
+  <script>
+  // Initialize collapse button
+  $(".button-collapse").sideNav();
+  // Initialize collapsible (uncomment the line below if you use the dropdown variation)
+  $('.collapsible').collapsible();
+
+  $('.product-option').on('click', function(e){
+    console.log(e.target.innerText)
+    product = e.target.innerText;
+
+    mesh.geometry =  new THREE.PlaneGeometry(1.0, 1.0, 0.0);
+    // mesh.texture =
+
+  })
+
+  $('.design-option').on('click', function(e){
+    console.log(e.target.innerText)
+    design = e.target.innerText;
+  })
+
+  </script>
+
+
+  <video id="video" width=400 height=520 autoplay="true" style="display:none;"></video>
 
   <div style="width: 100%;">
-    <div style="width: 650px; margin-left:auto; margin-right:auto;">
-      <canvas id="canvas" style="width: 400px; height: 500px; float: left; border: solid 1px black;display:none;"></canvas>
-      <div id="container" style="width: 400px; height: 500px; float: left; border: solid 1px black;"></div>
+    <div style="width: 650px; margin-left:auto; margin-right:auto; ">
+      <canvas id="canvas" style="width: 400px; height: 520px; float: left; border: solid 1px black;display:none;"></canvas>
+      <div id="container" style="width: 400px; height: 520px; float: left;"></div>
     </div>
   </div>
 
