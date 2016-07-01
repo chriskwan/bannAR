@@ -23,6 +23,7 @@
   <script type="text/javascript" src="cv.js"></script>
   <script type="text/javascript" src="aruco.js"></script>
 
+
   <script>
     var video, canvas, context, imageData, detector, posit;
     var renderer1, renderer2, renderer;
@@ -198,6 +199,7 @@
     function updateObject(object, rotation, translation){
       // TODO set material texture
       // mesh.material.color.setHex(0xff0000);
+      // mesh.material = new
 
       object.scale.x = modelSize;
       object.scale.y = modelSize;
@@ -260,8 +262,17 @@
     </nav>
   </div>
 
+  <div class="row upload">
+    <div class="input-field">
+      <input value="" id="previewInput" type="text">
+      <label class="active" for="previewInput">Link to your Design:</label>
+    </div>
+  </div>
   <div class="fixed-action-btn" style="bottom: 45px; right: 24px;">
-    <a class="btn-floating btn-large waves-effect blue">
+    <!-- <a class="btn-floating btn-large waves-effect blue">
+      <i class="large material-icons">edit</i>
+    </a> -->
+    <a class="btn-floating btn-large waves-effect blue" id="previewBtn">
       <i class="large material-icons">arrow_forward</i>
     </a>
   </div>
@@ -276,9 +287,46 @@
     console.log(e.target.innerText)
     product = e.target.innerText;
 
+    function getBase64Image(img) {
+        // Create an empty canvas element
+        var c = document.createElement("canvas");
+        c.width = img.width;
+        c.height = img.height;
+
+        // Copy the image contents to the canvas
+        var ctx = c.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+
+        // Get the data-URL formatted image
+        // Firefox supports PNG and JPEG. You could check img.src to
+        // guess the original format, but be aware the using "image/jpg"
+        // will re-encode the image.
+        var dataURL = canvas.toDataURL("image/png");
+
+        return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+    }
+
     if(product == "Horizontal Banner"){
       mesh.geometry =  new THREE.BoxGeometry( 10, 5, 0.1 );
-      mesh.material.color.setHex(0xff0000);
+      var i = $("#previewImage")[0];
+      var idatau
+      try {
+        idatau = getBase64Image(i);
+      } catch (e) {
+        idatau = document.getElementById("previewInput").value || "http://exmoorpet.com/wp-content/uploads/2012/08/cat.png";
+      }
+      debugger;
+
+      // var txt = new THREE.Texture( idatau );
+      THREE.ImageUtils.crossOrigin = '';
+      var txt = THREE.ImageUtils.loadTexture("http://exmoorpet.com/wp-content/uploads/2012/08/cat.png")
+      txt.needsUpdate = true;
+      mesh.material = new THREE.MeshBasicMaterial( {map: txt} )
+
+      // var imageElement = document.createElement('img');
+      // imageElement.onload = function(e) {
+      // };
+      // imageElement.src = "http://exmoorpet.com/wp-content/uploads/2012/08/cat.png";
 
     } else if(product == "Vertical Banner"){
       mesh.geometry =  new THREE.BoxGeometry( 5, 10, 0.1 );
@@ -296,6 +344,11 @@
     design = e.target.innerText;
   })
 
+
+  $(".edit").on("click", function(e){
+    $(".upload").show();
+  })
+
   </script>
 
 
@@ -307,8 +360,8 @@
       <div id="container" style="width: 400px; height: 520px; float: left;"></div>
     </div>
   </div>
-
-
+  <img id="previewImage"/>
+<script type="text/javascript" src="preview.js"></script>
 </body>
 
 </html>
