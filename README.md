@@ -6,5 +6,6 @@ Use augmented reality to preview banners (and other printed products) in your ow
 ## Demos ##
 * Color (e.g. Post-it) markers: https://chriskwan.github.io/bannAR/pixel-check/
 * QR code markers with banner preview: https://chriskwan.github.io/bannAR/aruco/debug-posit.html
+  * Print your own markers: https://github.com/chriskwan/bannAR/tree/MarkerImages/Marker%20Images  
 
 ![](./bannAR-demo.jpeg)
